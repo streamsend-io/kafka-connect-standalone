@@ -1,0 +1,39 @@
+version: '3'
+services:
+  uploader:
+    image: streamsend/kafka-connect-standalone:7.6.2
+    container_name: connect-standalone
+    ports:
+      - 8083:8083
+    deploy:
+      replicas: 1
+    environment:
+      CONNECT_GROUP_ID: "standalone-group"
+      #CONNECT_CLIENT_ID: "standalone-client"
+      CONNECT_REST_ADVERTISED_HOST_NAME: 'standalone'
+      CONNECT_OFFSET_STORAGE_FILE_FILENAME: /tmp/connect-standalone.txt
+      CONNECT_REST_PORT: 8083
+      CONNECT_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      CONNECT_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_SASL_MECHANISM: PLAIN
+      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${APIKEY}\" password=\"${SECRET}\";"
+      CONNECT_PRODUCER_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${APIKEY}\" password=\"${SECRET}\";"
+      CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_PRODUCER_SASL_MECHANISM: PLAIN
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components/'
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: 'false'
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: 'false'
+      #CONNECT_LOG4J_LOGGERS: org.apache.kafka.clients.consumer.internals.ConsumerCoordinator=ERROR,org.apache.kafka.clients.consumer.internals.ConsumerUtils=ERROR,org.apache.kafka.clients.consumer.ConsumerConfig=ERROR,org.apache.kafka.clients.producer.ProducerConfig=ERROR
+    command:
+      - bash
+      - -c
+      - |
+        #!# confluent-hub install --no-prompt  ...
+        /etc/confluent/docker/run &
+        sleep infinity
