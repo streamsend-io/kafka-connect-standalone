@@ -5,13 +5,15 @@ services:
     container_name: connect-standalone
     ports:
       - 8083:8083
+    volumes:
+     - /tmp/kafka-connect-offsets:/tmp/kafka-connect-offsets
     deploy:
       replicas: 1
     environment:
       CONNECT_GROUP_ID: "standalone-group"
       #CONNECT_CLIENT_ID: "standalone-client"
       CONNECT_REST_ADVERTISED_HOST_NAME: 'standalone'
-      CONNECT_OFFSET_STORAGE_FILE_FILENAME: /tmp/connect-standalone.txt
+      CONNECT_OFFSET_STORAGE_FILE_FILENAME: /tmp/kafka-connect-offsets/connect-standalone-offsets.txt
       CONNECT_REST_PORT: 8083
       CONNECT_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
       CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
@@ -27,9 +29,6 @@ services:
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components/'
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: 'false'
-      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: 'false'
-      #CONNECT_LOG4J_LOGGERS: org.apache.kafka.clients.consumer.internals.ConsumerCoordinator=ERROR,org.apache.kafka.clients.consumer.internals.ConsumerUtils=ERROR,org.apache.kafka.clients.consumer.ConsumerConfig=ERROR,org.apache.kafka.clients.producer.ProducerConfig=ERROR
     command:
       - bash
       - -c
